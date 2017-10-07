@@ -6,10 +6,13 @@ defmodule Snapchat.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
+
     # List all child processes to be supervised
     children = [
       # Starts a worker by calling: Snapchat.Worker.start_link(arg)
       # {Snapchat.Worker, arg},
+      Plug.Adapters.Cowboy.child_spec(:http, WebRouter, [], [port: 4000])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
