@@ -3,7 +3,7 @@ defmodule Snapchat.User do
 
   defstruct name: "", matcher_pid: nil, messages: []
 
-  def start_link(name, matcher_pid) do
+  def start_link(name, matcher_pid \\ nil) do
     {:ok, pid} = GenServer.start_link(__MODULE__,
       %Snapchat.User{name: name, matcher_pid: matcher_pid, messages: []})
     pid
@@ -15,6 +15,10 @@ defmodule Snapchat.User do
 
   def new_message(pid, message) do
     GenServer.cast pid, {:new_message, message}
+  end
+
+  def set_matcher(pid, matcher_pid) do
+    GenServer.cast pid, {:set_matcher, matcher_pid}
   end
 
   def init(name, matcher_pid) do
