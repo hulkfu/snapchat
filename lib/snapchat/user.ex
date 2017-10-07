@@ -1,4 +1,7 @@
 defmodule Snapchat.User do
+  @moduledoc """
+  每个在线的用户对应一个 user 进程。用户下线，这个进程则停止。
+  """
   require Logger
 
   use GenServer

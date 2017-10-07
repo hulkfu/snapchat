@@ -1,21 +1,9 @@
 # Snapchat
 
-**TODO: Add description**
+ 一个模仿 Snapchat 的随机聊天软件。
 
-## Installation
+# module
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `snapchat` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:snapchat, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/snapchat](https://hexdocs.pm/snapchat).
-
+- web 提供 web 服务。
+- server 提供配对服务。
+- user 每个在线的用户对应一个 user 进程。
