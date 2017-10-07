@@ -1,4 +1,6 @@
 defmodule Snapchat.User do
+  require Logger
+
   use GenServer
 
   defstruct name: "", matcher_pid: nil, messages: []
@@ -26,7 +28,7 @@ defmodule Snapchat.User do
   end
 
   def handle_call(:get_message, _from, user) do
-    IO.puts inspect(user)
+    Logger.info "get_message: " <> inspect(user)
     {new_message, last_messages} = List.pop_at user.messages, 0
     {:reply, new_message, %{user | messages: last_messages}}
   end
