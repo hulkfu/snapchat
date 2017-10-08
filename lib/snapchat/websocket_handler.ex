@@ -14,7 +14,7 @@ defmodule Snapchat.WebsocketHandler do
   def init(req, state) do
     Logger.debug "websocket init."
     user_pid = Snapchat.User.start_link(self())
-    {:cowboy_websocket, req, state}
+    {:cowboy_websocket, req, %{user_pid: user_pid}}
   end
 
   # Put any essential clean-up here.
@@ -30,20 +30,24 @@ defmodule Snapchat.WebsocketHandler do
   # including text, binary, ping or pong messages. But you need not
   # handle ping/pong, cowboy takes care of that.
   def websocket_handle({:text, content}, req, state) do
-    Logger.debug "websocket_handle: " <> content
+    Logger.debug "websocket_handle: " <> content <> " state: " <> inspect(state)
 
     # Use JSX to decode the JSON message and extract the word entered
     # by the user into the variable 'message'.
     { :ok, %{ "message" => message} } = JSX.decode(content)
 
+    Snapchat.User.send_matcher_message state.user_pid, message
+
+    { :ok, mysend } = JSX.encode(%{ send: message})
+    {:reply, {:text, mysend}, req, state}
     # Reverse the message and use JSX to re-encode a reply contatining
     # the reversed message.
-    rev = String.reverse(message)
-    { :ok, reply } = JSX.encode(%{ reply: rev})
+    # rev = String.reverse(message)
+    # { :ok, reply } = JSX.encode(%{ message: rev})
 
     # All websocket callbacks share the same return values.
     # See http://ninenines.eu/docs/en/cowboy/2.0/manual/cowboy_websocket/
-    {:reply, {:text, reply}, req, state}
+    # {:reply, {:text, reply}, req, state}
   end
 
   # Fallback clause for websocket_handle.  If the previous one does not match

@@ -52,6 +52,9 @@ var SocketHandler = (function(){
     if(message.message !== undefined) {
       $('#messages').prepend('<li style="color: green;">' + message.message + '</li>');
     }
+    if(message.send !== undefined) {
+      $('#messages').prepend('<li> me: ' + message.send + '</li>');
+    }
     if(message.status !== undefined && message.status == "matched") {
       updateStatus('<span style="color: green;">MATCHED </span>');
     }
@@ -60,7 +63,6 @@ var SocketHandler = (function(){
   function sendMessage(){
     value = $('#message_string').val();
     message = { 'message': value};
-    $('#messages').prepend('<li> me: ' + message.message + '</li>');
     websocket.send(JSON.stringify(message));
   };
 
