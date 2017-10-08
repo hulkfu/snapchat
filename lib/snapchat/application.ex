@@ -15,11 +15,11 @@ defmodule Snapchat.Application do
                                  [{ :env, [{:dispatch, dispatch_config}]}]
                                  )
 
+    Snapchat.Matcher.start_link()
+
     # List all child processes to be supervised
     children = [
       # Starts a worker by calling: Snapchat.Worker.start_link(arg)
-      # {Snapchat.Worker, arg},
-
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

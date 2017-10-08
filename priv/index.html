@@ -1,24 +1,96 @@
-<head>
-<script>
-wsServer = 'ws://localhost:4000/ws';
-websocket = new WebSocket(wsServer);
+<html>
+  <head>
+    <title>Snapchat</title>
+    <link href='/static/css/styles.css' rel='stylesheet' type='text/css'/>
+    <script src="/static/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id='main'>
+      <div id='header'>
+        <h1>Snapchat</h1>
+      </div>
+      <hr>
+      <div id='dynamic'>
+        <h2 id='statusbar'>Status: <span id='status'></span></h2>
+        <div>
+          <h3>Server Time: <span id='server_time' class='time'></span></h3>
+        </div>
 
-websocket.onopen = function (evt) { websocket.send("ping") };
-function onMessage(evt) {
-  console.log('Retrieved data from server: ' + evt.data);
-}
-websocket.onmessage = function (evt) { onMessage(evt) };
+        <div id="push">
+          <h2>Messages</h2>
+        </div>
+        
+        <div id="pull">
+          <h2>Send Message</h2>
+          <p>
+            Click the button below to send a message to the matcher.
+          </p>
+          <input id='message_string' placeholder='Enter a message'></input>
+          <button id='send'>Send</button>
+          <div>
+            <h3>Server Reply: <span id='server_reply' class='reply'>&nbsp;</span></h3>
+          </div>
+        </div>
 
-</script>
-</head>
+      </div>
+    </div>
 
-<body>
-<h1>Snapchat</h1>
-<ul>
-  <li>hello</li>
-</ul>
-<form>
-  <input placeholder="to say..." name="say" type="text" autofocus="">
-  <button type="submit" tabindex="1">Say</button>
-</form>
-</body>
+  <script>
+var SocketHandler = (function(){
+  var my = {},
+    websocket,
+    messages = 0;
+
+  my.init = function(){
+    $('#send').click(sendMessage);
+    connect();
+  }
+  function connect() {
+    websocket = new WebSocket('ws://localhost:4000/ws');
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+  };
+
+  function onMessage(evt) {
+    //console.log(evt.data);
+    message = JSON.parse(evt.data);
+    if ( message.time !== undefined) {
+      $('#server_time').html(message.time);
+    }
+    if(message.reply !== undefined) {
+      $('#server_reply').html(message.reply);
+    }
+    if(message.status !== undefined && message.status == "matched") {
+      updateStatus('<span style="color: green;">MATCHED </span>');
+    }
+  };
+
+  function sendMessage(){
+    value = $('#message_string').val();
+    message = { 'message': value};
+    websocket.send(JSON.stringify(message));
+  };
+
+  function disconnect() {
+    websocket.close();
+  };
+
+  function onOpen(evt) {
+    updateStatus('<span style="color: red;">UNMATCHED </span>');
+  };
+
+  function onClose(evt) {
+    updateStatus('<span style="color: red;">DISCONNECTED </span>');
+  };
+
+  function updateStatus(txt) {
+    $('#status').html(txt);
+  };
+
+  return my;
+}());
+SocketHandler.init();
+  </script>
+  </body>
+</html>

@@ -1,4 +1,6 @@
 defmodule Snapchat.WebsocketHandler do
+  require Logger
+
   @behaviour :cowboy_websocket
 
   # We are using the regular http init callback to perform handshake.
@@ -11,6 +13,8 @@ defmodule Snapchat.WebsocketHandler do
   # supported protocol(s).
   def init(req, state) do
     :erlang.start_timer(1000, self(), [])
+    Logger.debug "websocket init."
+    Snapchat.User.start_link(self())
     {:cowboy_websocket, req, state}
   end
 
@@ -20,13 +24,14 @@ defmodule Snapchat.WebsocketHandler do
   end
 
   def websocket_handle({:text, "ping"}, req, state) do
-    {:reply, {:text, "pang"}, req, state}
+    {:reply, {:text, "pong"}, req, state}
   end
 
   # websocket_handle deals with messages coming in over the websocket,
   # including text, binary, ping or pong messages. But you need not
   # handle ping/pong, cowboy takes care of that.
   def websocket_handle({:text, content}, req, state) do
+    Logger.debug "websocket_handle: " <> content
 
     # Use JSX to decode the JSON message and extract the word entered
     # by the user into the variable 'message'.
@@ -73,6 +78,22 @@ defmodule Snapchat.WebsocketHandler do
     # a 'reply'.  That makes the format for outbound websocket messages
     # exactly the same as websocket_handle()
     { :reply, {:text, message}, req, state}
+  end
+
+  def websocket_info({:message, message}, req, state) do
+    {:ok, message} = JSX.encode(%{reply: message})
+    {:reply, {:text, message}, req, state}
+  end
+
+  def websocket_info({:status, status}, req, state) do
+    {:ok, message} = JSX.encode(%{status: status})
+    {:reply, {:text, message}, req, state}
+  end
+
+  # Format and forward elixir messages to client
+  def websocket_info(message, req, state) do
+    Logger.debug "websocket_info: " <> message
+    {:reply, {:text, message}, req, state}
   end
 
   # fallback message handler
