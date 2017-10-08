@@ -12,14 +12,11 @@
       <hr>
       <div id='dynamic'>
         <h2 id='statusbar'>Status: <span id='status'></span></h2>
-        <div>
-          <h3>Server Time: <span id='server_time' class='time'></span></h3>
-        </div>
 
         <div id="push">
           <h2>Messages</h2>
         </div>
-        
+
         <div id="pull">
           <h2>Send Message</h2>
           <p>
@@ -55,9 +52,6 @@ var SocketHandler = (function(){
   function onMessage(evt) {
     //console.log(evt.data);
     message = JSON.parse(evt.data);
-    if ( message.time !== undefined) {
-      $('#server_time').html(message.time);
-    }
     if(message.reply !== undefined) {
       $('#server_reply').html(message.reply);
     }

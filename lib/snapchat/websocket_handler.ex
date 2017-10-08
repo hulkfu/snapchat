@@ -12,7 +12,6 @@ defmodule Snapchat.WebsocketHandler do
   # then add the same header to `req` with value containing
   # supported protocol(s).
   def init(req, state) do
-    :erlang.start_timer(1000, self(), [])
     Logger.debug "websocket init."
     Snapchat.User.start_link(self())
     {:cowboy_websocket, req, state}
@@ -56,29 +55,9 @@ defmodule Snapchat.WebsocketHandler do
   end
 
   # websocket_info is the required callback that gets called when erlang/elixir
-  # messages are sent to the handler process. In this example, the only erlang
-  # messages we are passing are the :timeout messages from the timing loop.
-  #
+  # messages are sent to the handler process.
   # In a larger app various clauses of websocket_info might handle all kinds
   # of messages and pass information out the websocket to the client.
-  def websocket_info({_timeout, _ref, _msg}, req, state) do
-
-    time = time_as_string()
-
-    # encode a json reply in the variable 'message'
-    { :ok, message } = JSX.encode(%{ time: time})
-
-    # set a new timer to send a :timeout message back to this
-    # process a second from now. This will recursively call
-    # this handler, acting as a tick.
-    :erlang.start_timer(1000, self(), [])
-
-    # send the new message to the client. Note that even though there was no
-    # incoming message from the client, we still call the outbound message
-    # a 'reply'.  That makes the format for outbound websocket messages
-    # exactly the same as websocket_handle()
-    { :reply, {:text, message}, req, state}
-  end
 
   def websocket_info({:message, message}, req, state) do
     {:ok, message} = JSX.encode(%{reply: message})
@@ -99,12 +78,6 @@ defmodule Snapchat.WebsocketHandler do
   # fallback message handler
   def websocket_info(_info, _req, state) do
     {:ok, state}
-  end
-
-  def time_as_string do
-    {hh, mm, ss} = :erlang.time()
-    :io_lib.format("~2.10.0B:~2.10.0B:~2.10.0B", [hh, mm, ss])
-    |> :erlang.list_to_binary()
   end
 
 end
