@@ -10,7 +10,7 @@ defmodule Snapchat.WebsocketHandler do
   # then add the same header to `req` with value containing
   # supported protocol(s).
   def init(req, state) do
-    :erlang.start_timer(1000, self, [])
+    :erlang.start_timer(1000, self(), [])
     {:cowboy_websocket, req, state}
   end
 
@@ -28,14 +28,14 @@ defmodule Snapchat.WebsocketHandler do
   # handle ping/pong, cowboy takes care of that.
   def websocket_handle({:text, content}, req, state) do
 
-    # Use JSEX to decode the JSON message and extract the word entered
+    # Use JSX to decode the JSON message and extract the word entered
     # by the user into the variable 'message'.
-    { :ok, %{ "message" => message} } = JSEX.decode(content)
+    { :ok, %{ "message" => message} } = JSX.decode(content)
 
-    # Reverse the message and use JSEX to re-encode a reply contatining
+    # Reverse the message and use JSX to re-encode a reply contatining
     # the reversed message.
     rev = String.reverse(message)
-    { :ok, reply } = JSEX.encode(%{ reply: rev})
+    { :ok, reply } = JSX.encode(%{ reply: rev})
 
     # All websocket callbacks share the same return values.
     # See http://ninenines.eu/docs/en/cowboy/2.0/manual/cowboy_websocket/
@@ -61,12 +61,12 @@ defmodule Snapchat.WebsocketHandler do
     time = time_as_string()
 
     # encode a json reply in the variable 'message'
-    { :ok, message } = JSEX.encode(%{ time: time})
+    { :ok, message } = JSX.encode(%{ time: time})
 
     # set a new timer to send a :timeout message back to this
     # process a second from now. This will recursively call
     # this handler, acting as a tick.
-    :erlang.start_timer(1000, self, [])
+    :erlang.start_timer(1000, self(), [])
 
     # send the new message to the client. Note that even though there was no
     # incoming message from the client, we still call the outbound message
