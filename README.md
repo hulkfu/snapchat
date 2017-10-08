@@ -2,6 +2,10 @@
 
  一个模仿 Snapchat 的随机聊天软件。
 
+ 演示地址在：http://qrdiy.com:4000
+
+ 可以用多个浏览器进行配对测试。
+
 # module
 
 - matcher 配对服务进程。
@@ -14,3 +18,12 @@
 mix deps.get
 iex -S mix
 ```
+
+# TODO
+- 进程的监控。
+- user 的详细信息
+  - name
+  - avatar
+- 消息的多样化
+  - 图片
+  - 流媒体
