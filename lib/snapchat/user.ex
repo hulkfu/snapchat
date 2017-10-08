@@ -14,7 +14,7 @@ defmodule Snapchat.User do
     Logger.debug "New user."
     {:ok, pid} = GenServer.start_link(__MODULE__,
       %Snapchat.User{ws_pid: ws_pid, name: name, matcher_pid: matcher_pid, messages: []})
-    send ws_pid, {:message, "new_online"}
+    send ws_pid, {:message, "online"}
     Snapchat.Matcher.new_user pid
     pid
   end
@@ -43,6 +43,7 @@ defmodule Snapchat.User do
   end
 
   def handle_cast({:new_message, message}, user) do
+    send user.ws_pid, {:new_message, "message"}
     {:noreply, %{user | messages: [message] ++ user.messages}}
   end
 

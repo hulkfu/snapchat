@@ -13,7 +13,7 @@ defmodule Snapchat.WebsocketHandler do
   # supported protocol(s).
   def init(req, state) do
     Logger.debug "websocket init."
-    Snapchat.User.start_link(self())
+    user_pid = Snapchat.User.start_link(self())
     {:cowboy_websocket, req, state}
   end
 
@@ -60,7 +60,7 @@ defmodule Snapchat.WebsocketHandler do
   # of messages and pass information out the websocket to the client.
 
   def websocket_info({:message, message}, req, state) do
-    {:ok, message} = JSX.encode(%{reply: message})
+    {:ok, message} = JSX.encode(%{message: message})
     {:reply, {:text, message}, req, state}
   end
 

@@ -13,21 +13,18 @@
       <div id='dynamic'>
         <h2 id='statusbar'>Status: <span id='status'></span></h2>
 
-        <div id="push">
-          <h2>Messages</h2>
-        </div>
-
-        <div id="pull">
+        <div id="">
           <h2>Send Message</h2>
           <p>
             Click the button below to send a message to the matcher.
           </p>
           <input id='message_string' placeholder='Enter a message'></input>
           <button id='send'>Send</button>
-          <div>
-            <h3>Server Reply: <span id='server_reply' class='reply'>&nbsp;</span></h3>
-          </div>
         </div>
+
+        <h2>Messages</h2>
+        <ul id="messages">
+        </ul>
 
       </div>
     </div>
@@ -52,8 +49,8 @@ var SocketHandler = (function(){
   function onMessage(evt) {
     //console.log(evt.data);
     message = JSON.parse(evt.data);
-    if(message.reply !== undefined) {
-      $('#server_reply').html(message.reply);
+    if(message.message !== undefined) {
+      $('#messages').prepend('<li style="color: green;">' + message.message + '</li>');
     }
     if(message.status !== undefined && message.status == "matched") {
       updateStatus('<span style="color: green;">MATCHED </span>');
@@ -63,6 +60,7 @@ var SocketHandler = (function(){
   function sendMessage(){
     value = $('#message_string').val();
     message = { 'message': value};
+    $('#messages').prepend('<li> me: ' + message.message + '</li>');
     websocket.send(JSON.stringify(message));
   };
 
