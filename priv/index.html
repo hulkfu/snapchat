@@ -40,7 +40,8 @@ var SocketHandler = (function(){
     connect();
   }
   function connect() {
-    websocket = new WebSocket('ws://localhost:4000/ws');
+    url = window.location.href.split("/")
+    websocket = new WebSocket('ws://' + url[2] + '/ws');
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
     websocket.onmessage = function(evt) { onMessage(evt) };
