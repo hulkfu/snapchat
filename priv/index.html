@@ -59,6 +59,9 @@ var SocketHandler = (function(){
     if(message.status !== undefined && message.status == "matched") {
       updateStatus('<span style="color: green;">MATCHED </span>');
     }
+    if(message.status !== undefined && message.status == "unmatched") {
+      updateStatus('<span style="color: red;">UNMATCHED </span>');
+    }
   };
 
   function sendMessage(){

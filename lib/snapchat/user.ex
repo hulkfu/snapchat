@@ -37,6 +37,10 @@ defmodule Snapchat.User do
     GenServer.cast user_pid, {:send_matcher_message, message}
   end
 
+  def set_matcher_free(user_pid) do
+    GenServer.cast user_pid, :set_matcher_free
+  end
+
   # def init(ws_pid, name, matcher_pid) do
   #   {:ok, %Snapchat.User{ws_pid: ws_pid, name: name, matcher_pid: matcher_pid, messages: []}}
   # end
@@ -52,6 +56,11 @@ defmodule Snapchat.User do
     {:noreply, %{user | messages: [message] ++ user.messages}}
   end
 
+  def handle_cast({:set_matcher, nil}, user) do
+    send user.ws_pid, {:status, "unmatched"}
+    {:noreply, %{user | matcher_pid: nil}}
+  end
+
   def handle_cast({:set_matcher, matcher_pid}, user) do
     Logger.debug "set_matcher for " <> inspect(matcher_pid)
     send user.ws_pid, {:status, "matched"}
@@ -62,5 +71,10 @@ defmodule Snapchat.User do
     Logger.debug "send_matcher_message: " <> message
     new_message user.matcher_pid, message
     {:noreply, user}
+  end
+
+  def handle_cast(:set_matcher_free, user) do
+    GenServer.cast user.matcher_pid, {:set_matcher, nil}
+    {:noreply, %{user | matcher_pid: nil}}
   end
 end
