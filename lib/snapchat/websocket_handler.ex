@@ -18,7 +18,9 @@ defmodule Snapchat.WebsocketHandler do
   end
 
   # Put any essential clean-up here.
-  def terminate(_reason, _req, _state) do
+  def terminate(_reason, _req, state) do
+    Logger.debug "websocket terminate."
+    Snapchat.Matcher.del_user state.user_pid
     :ok
   end
 

@@ -16,10 +16,14 @@ defmodule Snapchat.Matcher do
     GenServer.cast __MODULE__, {:new_user, user_pid}
   end
 
-  # can match
+  def del_user(user_pid) do
+    GenServer.cast __MODULE__, {:del_user, user_pid}
+  end
+
   def handle_cast({:new_user, user_pid}, users) do
     Logger.debug "Matcher users: " <> inspect(users)
     if rem(length(users), 2) == 1 do
+      # can match
       {pre_user_pid, last_users} = List.pop_at users, -1
       Snapchat.User.set_matcher pre_user_pid, user_pid
       {:noreply, last_users}
@@ -28,6 +32,10 @@ defmodule Snapchat.Matcher do
       {:noreply, List.insert_at(users, 0, user_pid)}
     end
 
+  end
+
+  def handle_cast({:del_user, user_pid}, users) do
+    {:noreply, List.delete(users, user_pid)}
   end
 
 end
