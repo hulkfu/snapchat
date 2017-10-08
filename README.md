@@ -20,7 +20,8 @@ iex -S mix
 ```
 
 # TODO
-- 进程的监控。
+- Production 的自动部署
+- 进程的监控
 - user 的详细信息
   - name
   - avatar
